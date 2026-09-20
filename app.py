@@ -1,38 +1,68 @@
-import streamlit as st
+import tkinter as tk
+import random
+from tkinter import messagebox
 
-st.set_page_config(page_title="มีอะไรจะถามหน่อยยย 💖", page_icon="💖", layout="centered")
+# ฟังก์ชันเมื่อแฟนกดปุ่ม "ตกลง"
+def clicked_yes():
+    # ซ่อนหน้าต่างหลัก
+    root.withdraw()
+    # เด้งกล่องข้อความบอกรัก
+    messagebox.showinfo("เค้ารักเบบี๋มากเลยนะอยู่ด้วยกันไปนานๆนะ", "รักนะจุ๊ปมั้วฟฟฟฟฟ")
+    root.destroy()
 
-st.markdown("""
-    <style>
-    .stApp { background-color: #ffe6e6; }
-    h1 { color: #cc0000; text-align: center; font-family: 'Arial', sans-serif; }
-    div.stButton > button {
-        background-color: #ff4d4d; color: white; border-radius: 20px;
-        padding: 10px 25px; font-weight: bold; border: none; width: 100%;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# ฟังก์ชันทำให้ปุ่ม "ไม่" วาร์ปหนีเมื่อเมาส์เลื่อนมาโดน
+def move_no_button(event):
+    while True:
+        new_x = random.randint(20, 290)
+        new_y = random.randint(120, 250)
+        # ไม่ให้ไปทับปุ่มตกลง (x 70-180, y 160-200)
+        overlap = (new_x < 180 and new_x + 110 > 70 and
+                   new_y < 200 and new_y + 40 > 160)
+        if not overlap:
+            break
+    button_no.place(x=new_x, y=new_y)
 
-st.write("# เค้ารักเบบี๋มากเลยนะอยู่ด้วยกันกับเค้าไปนานๆเลยนะ 🥺")
+# สร้างหน้าต่างโปรแกรม
+root = tk.Tk()
+root.title("มีอะไรจะถามหน่อยยย 💖")
+root.geometry("400x300")
+root.configure(bg="#ffe6e6")
+root.resizable(False, False)
 
-if 'agreed' not in st.session_state:
-    st.session_state.agreed = False
-if 'no_click_count' not in st.session_state:
-    st.session_state.no_click_count = 0
+# ข้อความคำถาม
+label_title = tk.Label(
+    root,
+    text="เป็นแฟนกันแล้ว\nห้ามทิ้งกันไปไหนนะ ตกลงไหม? 🥺",
+    font=("Arial", 16, "bold"),
+    bg="#ffe6e6",
+    fg="#cc0000"
+)
+label_title.pack(pady=40)
 
-if not st.session_state.agreed:
-    col1, col2 = st.columns(2)
+# ปุ่มตกลง (Yes)
+button_yes = tk.Button(
+    root,
+    text="ตกลงอยู่แล้ว ❤️",
+    font=("Arial", 12, "bold"),
+    bg="#ff4d4d",
+    fg="white",
+    command=clicked_yes,
+    cursor="hand2"
+)
+button_yes.place(x=70, y=160, width=110, height=40)
 
-    with col1:
-        if st.button("ตกลงอยู่แล้ว ❤️", key="yes"):
-            st.session_state.agreed = True
-            st.rerun()
+# ปุ่มไม่ตกลง (No)
+button_no = tk.Button(
+    root,
+    text="ไม่ตกลง 😜",
+    font=("Arial", 12, "bold"),
+    bg="#b3b3b3",
+    fg="white"
+)
+button_no.place(x=210, y=160, width=110, height=40)
 
-    with col2:
-        no_texts = ["ไม่ตกลง 😜", "คิดใหม่ซิ๊ 🥺", "กดปุ่มแรกเถอะจ้า 💖", "กดยังไงก็ไม่ได้หรอก แบร่ 😝"]
-        if st.button(no_texts[st.session_state.no_click_count % len(no_texts)], key="no"):
-            st.session_state.no_click_count += 1
-            st.rerun()
-else:
-    st.balloons()
-    st.write("### เย้! น่ารักที่สุดในโลกเลยยยยย ยักนะงับบ 🥰❤️")
+# เมื่อเมาส์เลื่อนมาโดนปุ่ม No ให้วาร์ปหนี
+button_no.bind("<Enter>", move_no_button)
+
+# เริ่มทำงานโปรแกรม
+root.mainloop()
